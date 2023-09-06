@@ -5,12 +5,13 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 
 const userRoutes = require('./api/routes/userRoutes');
+const orderRoutes = require('./api/routes/orderRoutes');
 
+//mongoose connection
 mongoose.connect('mongodb+srv://admin:adminpw@cluster0.dfhsqqe.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
-
 
 app.use(morgan('dev'));
 app.use(express.json()) //option 1
@@ -27,10 +28,12 @@ app.use((req, res, next) => {
 })
 
 app.use('/user', userRoutes);
+app.use('/order', orderRoutes);
 
 app.use((req, res, next) => {
     const error = new Error('Not found');
-    error.status(404);
+    // error.status(404);
+    error.status = 404;
     next(error);
 })
 
