@@ -52,8 +52,15 @@ router.get('/', (req, res, next) => {
             "error": error
         })
       }else{
-        console.log(results.rows);
-        res.status(200).json(results.rows);
+        if(results.rowCount>0){
+            console.log(results.rows);
+            res.status(200).json(results.rows);
+        }else{
+            console.log("no order");
+            res.status(404).json({
+                "message": "no order"
+            })
+        }
       }
     });
 });
@@ -69,8 +76,15 @@ router.get('/:orderId', (req, res, next) => {
             "error": error
         })
       }else{
-        console.log(results.rows);
-        res.status(200).json(results.rows);
+        if(results.rowCount>0){
+            console.log(results.rows);
+            res.status(200).json(results.rows);
+        }else{
+            console.log("order not found");
+            res.status(404).json({
+                "message": "order not found"
+            })
+        }
       }
     });
 });
@@ -86,6 +100,21 @@ router.patch('/:orderId', (req, res, next) => {
     const newShipping_address = req.body.newShipping_address;
     const newPayment_status = req.body.newPayment_status;
 
+    const isFound=0;
+    const queryPre = 'SELECT * FROM orders WHERE order_id=$1;';
+    pool.query(queryPre, [orderId], (error, results) => {
+        if(error){
+            console.log(error);
+            res.status(500).json({
+                "error": error
+            })
+        }else{
+            if(results.rowCount>0){
+                isFound=1;
+            }
+        }
+    })
+
     const query = `
         UPDATE orders
         SET
@@ -99,38 +128,67 @@ router.patch('/:orderId', (req, res, next) => {
         WHERE order_id = $8;
     `;
     
-    pool.query(query,[newUser_id, newProduct_id, newQuantity, newTotal_price, newOrder_status, newShipping_address, newPayment_status, orderId], (error, results) => {
-        if (error){
-            console.log(error);
-            res.status(500).json({
-                "error": error
-            })
-        }else{
-            console.log("order updated");
-            res.status(200).json({
-                "message": "order updated"
-            })
-        }
-    })
+    if (isFound==1){
+        pool.query(query,[newUser_id, newProduct_id, newQuantity, newTotal_price, newOrder_status, newShipping_address, newPayment_status, orderId], (error, results) => {
+            if (error){
+                console.log(error);
+                res.status(500).json({
+                    "error": error
+                })
+            }else{
+                console.log("order updated");
+                res.status(200).json({
+                    "message": "order updated"
+                })
+            }
+        })
+    } else {
+        console.log("order not found");
+        res.status(404).json("order not found");
+    }
 })
 
 //delete order
 router.delete('/:orderId', (req, res, next) => {
     const orderId = req.params.orderId;
-    const query = "DELETE FROM orders WHERE order_Id=$1";
-    pool.query(query, [orderId], (error, results) => {
-        if (error){
+
+    const isFound=0;
+    const queryPre = 'SELECT * FROM orders WHERE order_id=$1;';
+    pool.query(queryPre, [orderId], (error, results) => {
+        if(error){
             console.log(error);
             res.status(500).json({
                 "error": error
-            });
+            })
         }else{
-            console.log("order delete");
-            res.status(200).json({
-                "message": "order delete"
-            });
+            if(results.rowCount>0){
+                isFound=1;
+            }
         }
     })
+
+    const query = "DELETE FROM orders WHERE order_Id=$1";
+
+    if (isFound==1){
+        pool.query(query, [orderId], (error, results) => {
+            if (error){
+                console.log(error);
+                res.status(500).json({
+                    "error": error
+                });
+            }else{
+                console.log("order delete");
+                res.status(200).json({
+                    "message": "order delete"
+                });
+            }
+        })
+    } else {
+        console.log("order not found");
+        res.status(404).json({
+            "message": "order not found"
+        })
+    }
 })
 
 module.exports = router;
