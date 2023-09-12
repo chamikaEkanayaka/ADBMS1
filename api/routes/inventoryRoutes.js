@@ -126,21 +126,3 @@ router.delete('/:productId', (req, res, next) => {
           res.status(200).json(results);
     })
 });
-
-function itemQuantity(productId, callback) {
-    const query = 'SELECT quantity FROM inventory WHERE product_id=?';
-    connection.query(query, [productId], (err, results) => {
-        if (err) {
-            console.error('Error executing MySQL query:', err);
-            callback(err, null);
-        } else {
-            if (results.length > 0) {
-                callback(null, results[0].quantity);
-            } else {
-                callback(null, 0);
-            }
-        }
-    });
-}
-
-module.exports = itemQuantity;

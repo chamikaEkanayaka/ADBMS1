@@ -23,34 +23,6 @@ router.post('/', (req, res, next) => {
     const order_status = req.body.order_status;
     const shipping_address = req.body.shipping_address;
     const payment_status = req.body.payment_status;
-
-    //check the stock
-    itemQuantity(product_id, (err, quantityRemain) => {
-        if (err) {
-            console.error('Error in check quantity:', err);
-        } else {
-            if (quantityRemain>=quantity){
-                const query = `INSERT INTO orders (user_id, product_id, order_date, quantity, total_price, order_status, shipping_address, payment_status)
-                            VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7) RETURNING *;`;
-                
-                pool.query(query,[user_id, product_id, quantity, total_price, order_status, shipping_address, payment_status], (error, results) => {
-                    if (error){
-                        console.log(error);
-                        res.status(500).json({
-                            "error": error
-                        })
-                    }else{
-                        console.log("order insert");
-                        res.status(200).json({
-                            "message": "order insert"
-                        })
-                    }
-                })
-            } else {
-                console.log("quantity is not enough");
-            }
-        }
-    });
 })
 
 //get all orders
