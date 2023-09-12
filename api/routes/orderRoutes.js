@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
 
+const itemQuantity = require('./inventoryRoutes');
+
 //postgres connection
 const pool = new Pool({
     user: 'postgres',
@@ -13,6 +15,7 @@ const pool = new Pool({
 
 //insert order
 router.post('/', (req, res, next) => {
+    //new order details from fe
     const user_id = req.body.user_id;
     const product_id = req.body.product_id;
     const quantity = req.body.quantity;
@@ -20,26 +23,34 @@ router.post('/', (req, res, next) => {
     const order_status = req.body.order_status;
     const shipping_address = req.body.shipping_address;
     const payment_status = req.body.payment_status;
-    
-    const query = `
-        INSERT INTO orders (user_id, product_id, order_date, quantity, total_price, order_status, shipping_address, payment_status)
-        VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7)
-        RETURNING *;
-    `;
-    
-    pool.query(query,[user_id, product_id, quantity, total_price, order_status, shipping_address, payment_status], (error, results) => {
-        if (error){
-            console.log(error);
-            res.status(500).json({
-                "error": error
-            })
-        }else{
-            console.log("order insert");
-            res.status(200).json({
-                "message": "order insert"
-            })
+
+    //check the stock
+    itemQuantity(product_id, (err, quantityRemain) => {
+        if (err) {
+            console.error('Error in check quantity:', err);
+        } else {
+            if (quantityRemain>=quantity){
+                const query = `INSERT INTO orders (user_id, product_id, order_date, quantity, total_price, order_status, shipping_address, payment_status)
+                            VALUES ($1, $2, NOW(), $3, $4, $5, $6, $7) RETURNING *;`;
+                
+                pool.query(query,[user_id, product_id, quantity, total_price, order_status, shipping_address, payment_status], (error, results) => {
+                    if (error){
+                        console.log(error);
+                        res.status(500).json({
+                            "error": error
+                        })
+                    }else{
+                        console.log("order insert");
+                        res.status(200).json({
+                            "message": "order insert"
+                        })
+                    }
+                })
+            } else {
+                console.log("quantity is not enough");
+            }
         }
-    })
+    });
 })
 
 //get all orders
