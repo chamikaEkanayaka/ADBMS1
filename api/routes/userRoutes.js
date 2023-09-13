@@ -21,7 +21,12 @@ router.get('/', (req, res, next) => {
             })
         }
     })
-    .catch();
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            "error" : err
+        })
+    });
 })
 
 //get user by userId
@@ -34,7 +39,6 @@ router.get('/:userId', (req, res, next) => {
             console.log(result);
             res.status(200).json(result);
         }else{
-            console.log(result);
             res.status(404).json({
                 "message": "user not found"
             });
@@ -64,7 +68,7 @@ router.post('/', (req, res, next) => {
     user
     .save()
     .then(result => {
-        console.log("insert new user",user);
+        console.log("inserted new user",user);
         res.status(200).json(user);
     })
     .catch(err => {
@@ -81,9 +85,9 @@ router.delete('/:userId', (req, res, next) => {
         deleteOne({_id:req.params.userId})
         .exec()
         .then(result => {
-            console.log("delete user");
+            console.log("deleteed user");
             res.status(200).json({
-                "message": "delete user"
+                "message": "deleteed user"
             })
         })
         .catch(err => {
@@ -108,9 +112,10 @@ router.patch('/:userId', (req, res, next) => {
         .updateOne({_id: id}, {$set: {passWd: req.body.newPassWd, firstName: req.body.newFirstName, lastName: req.body.newLastName, address: req.body.newAddress, phoneNo: req.body.newPhoneNo, userRole: req.body.UserRole}})
         .exec()
         .then(result => {
+            console.log("updated user");
             console.log(result);
             res.status(200).json({
-                "message": "update user"
+                "message": "updateed user"
             })
         })
         .catch(err => {
