@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const User = require('../models/user');
 const user = require('../models/user');
+const e = require('express');
 
 //get all users
 router.get('/', (req, res, next) => {
@@ -49,6 +50,38 @@ router.get('/:userId', (req, res, next) => {
         res.status(500).json({
             "error": err
         })
+    });
+})
+
+//check userId is valid
+router.get('/check/:userId', (req, res, next) => {
+    User
+    .findById(req.params.userId)
+    .exec()
+    .then(result => {
+        if (result == null){
+            console.log("not found");
+            res.status(404).json({
+                "message" : "not found"
+            })
+        } else {
+            console.log("found");
+            res.status(200).json({
+                "message" : "found"
+            })
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        if (err.name == "CastError"){
+            res.status(404).json({
+                "message" : "not found"
+            })
+        } else {
+            res.status(500).json({
+                "error": err
+            })
+        }
     });
 })
 
