@@ -120,7 +120,7 @@ router.delete('/:userId', (req, res, next) => {
         .then(result => {
             console.log("deleteed user");
             res.status(200).json({
-                "message": "deleteed user"
+                "message": "deleted user"
             })
         })
         .catch(err => {
