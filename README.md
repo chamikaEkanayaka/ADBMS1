@@ -1,7 +1,8 @@
 
-# Order Management API
+# User Management API
 
-This is a Node.js API for managing orders. It handles the creation, retrieval, updating, and deletion of orders in a PostgreSQL database. The API also interacts with other microservices to check product availability and user existence before processing orders.
+This is a Node.js API for managing users. It handles the creation, retrieval, updating, and deletion of user data in a MongoDB database.
+
 
 ## Table of Contents
 
@@ -18,22 +19,22 @@ To run this API locally or in your server, you need to follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/order-management-api.git
+   git clone https://github.com/yourusername/user-management-api.git
 
 2. Clone the repository:
 
    ```bash
-   cd order-management-api
-
+   cd user-management-api
 
 3. Clone the repository:
 
    ```bash
    npm install
 
-4. Configure the PostgreSQL database:
-- Make sure you have PostgreSQL installed and running.
-- Modify the database connection settings in the code (in the pool variable) to match your PostgreSQL setup.
+4. Configure the MongoDB database:
+- Make sure you have MongoDB installed and running.
+- Modify the database connection settings in the code to match your MongoDB setup.
+
 
 5. Start the API:
 
@@ -49,33 +50,50 @@ To use this API, you can make HTTP requests to the provided endpoints. Below are
 ## Endpoints
 The API provides the following endpoints:
 
-- POST /: Creates a new order.
-- GET /: Retrieves all orders.
-- GET /:orderId: Retrieves a single order by its ID.
-- PATCH /:orderId: Updates an existing order.
-- DELETE /:orderId: Deletes an order.
+- GET /: Retrieves all users.
+- GET /:userId: Retrieves a single user by their ID.
+- GET /check/:userId: Checks if a user with the specified ID exists.
+- POST /: Creates a new user.
+- PATCH /:userId: Updates an existing user.
+- DELETE /:userId: Deletes a user by their ID.
 
 #### Request and response formats
 The API expects all requests to be in JSON format. The responses will also be in JSON format.
 
 **Example request & response:**
 
-    ```bash
+Request:
+
     {
-      "user_id": 1,
-      "product_id": 2,
-      "quantity": 3,
-      "total_price": 100,
-      "order_status": "pending",
-      "shipping_address": "123 Main Street",
-      "payment_status": "paid"
-    }
- 
+        "email": "example@example.com",
+        "passWd": "password123",
+        "firstName": "John",
+        "lastName": "Doe",
+        "address": "123 Main Street",
+        "phoneNo": "555-123-4567",
+        "userRole": "user"
+      }
+
+      
+Response:
+
+      {
+        "_id": "5f8a61a63e1d7b3654d16f1a",
+        "email": "example@example.com",
+        "passWd": "password123",
+        "firstName": "John",
+        "lastName": "Doe",
+        "address": "123 Main Street",
+        "phoneNo": "555-123-4567",
+        "userRole": "user"
+      }
+
+   
 ## Dependencies
 
 - Express.js: A fast and minimalist web framework for Node.js.
-- PostgreSQL: A powerful, open-source relational database.
-- Axios: A promise-based HTTP client for making requests to other microservices.
+- MongoDB: A NoSQL database for storing user data.
+- Mongoose: An ODM (Object Data Modeling) library for MongoDB.
 - Other dependencies as specified in the package.json file.
 
 
